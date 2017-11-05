@@ -1,29 +1,54 @@
 from bs4 import BeautifulSoup
-import sys
-import json
 import requests
+import os
+import json
+import sqlite3
 
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
+conn = sqlite3.connect("bmtc.db")
+c = conn.cursor()
 
-url="https://www.mybmtc.com/en"
-driver = webdriver.Firefox()
-driver.get(url)
 
-elem = driver.find_element_by_id("quicktabs-tab-home_quick_tab_bottom-2")
-elem.click()
+print("enter the type of bus")
+bustype=input()
+if (bustype=='A/C-Service'):
+    url1="https://www.mybmtc.com/ac-service?fareid=acs&qt-home_quick_tab_bottom=2"
+elif (bustype=='General Service'):
+    url1="https://www.mybmtc.com/general-service?fareid=gns&qt-home_quick_tab_bottom=2"
+else:
+    print("Please Type valid bus service")
+    os._exit(1)
 
-elem = driver.find_element_by_id("fare_select_id")
-elem.send_keys("A/C Service")
+data = []
+req1=requests.get(url1)
+data1 =req1.text
+soup=BeautifulSoup(data1,"html.parser")
+rows = soup.find_all('tr')
+for row in rows:
+   
+    cols = row.find_all('td')
+    cols = [ele.text.strip() for ele in cols]
+    data.append([ele for ele in cols if ele])
 
-elem = driver.find_element_by_id("edit-submit--2")
-elem.click()
+print(data)
 
-WebDriverWait(driver, 50).until(EC.visibility_of_element_located((By.CLASS_NAME, "sticky-enabled tableheader-processed sticky-table"))) 
+#data1={["Fare Stage Number", "Adults", "Children", "Senior Citizens"],data}
 
-table =  driver.find_element_by_xpath('//*[@id="pub_fare_list_form"]/table[2]')
-for row in table.find_element_by_xpath('//*[@id="pub_fare_list_form"]/table[2]/tbody/tr'):
-    print([td.text for td in row.find_elements_by_xpath('//*[@id="pub_fare_list_form"]/table[2]/tbody/tr[row]/td')])
+with open('data1.json', 'w') as outfile:
+    json.dump(data, outfile)
+
+c.execute('CREATE TABLE IF NOT EXISTS fares(Fare Stage Number TEXT, Adults TEXT, Children TEXT, Senior Citizens TEXT)')
+
+
+c.executemany("INSERT INTO fares (bus_id, route_id, timings, bus_Stop) values (? , ? , ? , ?)",
+        (bus, route, time, stop) 
+    )
+conn.commit()
+c.execute("SELECT * FROM fares")
+
+data = c.fetchall()
+   
+for row in data:
+    print(row)
+c.close()
+conn.close()
+
