@@ -46,7 +46,7 @@ elem.click()
 elem=driver.find_element_by_link_text("Route Timings")
 elem.click()
 
-elem = driver.find_elements_by_id("routes > tbody > tr:nth-child(3) > td > ul > li:nth-child(1)")
+elem = driver.find_elements_by_id("routes > tbody > tr:nth-child > td > ul > li:nth-child")
 for element in elem:
     print(element.text)
 
@@ -64,6 +64,6 @@ elem.send_keys("A/C Service").click()
 elem = driver.find_element_by_id("edit-submit--2")
 elem.click()
 
-elem = driver.find_element_by_id("pub_fare_list_form > table.sticky-enabled.tableheader-processed.sticky-table")
-elem.click()
-
+table =  driver.find_element_by_xpath('//*[@id="pub_fare_list_form"]/table[2]')
+for row in table.find_element_by_xpath('//*[@id="pub_fare_list_form"]/table[2]/tbody/tr'):
+    print([td.text for td in row.find_elements_by_xpath('//*[@id="pub_fare_list_form"]/table[2]/tbody/tr[row]/td')])
