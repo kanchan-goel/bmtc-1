@@ -40,7 +40,7 @@ for i in soup.find_all('class',{'id':'busstop_name'}):
     print(stop)
     
 '''
-elem = driver.find_elements_by_id("cboxClose")
+elem = driver.find_element_by_id("cboxClose")
 elem.click()
 
 elem=driver.find_element_by_link_text("Route Timings")
@@ -50,7 +50,7 @@ elem = driver.find_elements_by_id("routes > tbody > tr:nth-child(3) > td > ul > 
 for element in elem:
     print(element.text)
 
-elem = driver.find_elements_by_id("cboxClose")
+elem = driver.find_element_by_id("cboxClose")
 elem.click()
 
 
@@ -64,5 +64,6 @@ elem.send_keys("A/C Service").click()
 elem = driver.find_element_by_id("edit-submit--2")
 elem.click()
 
-
+elem = driver.find_element_by_id("pub_fare_list_form > table.sticky-enabled.tableheader-processed.sticky-table")
+elem.click()
 
